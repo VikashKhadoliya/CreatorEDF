@@ -21,19 +21,14 @@ export default function PaymentReconciliationPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="border-b border-slate-200 pb-5">
         <div>
           <h1 className="text-2xl font-bold text-navy-800 tracking-tight">
-            Foreign Remittance & Payment Reconciliation
+            Payment Reconciliation
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Reconcile platform remittance advices with bank credit notifications, monitor intermediary fees, and track FEMA 9-month realization windows.
+            Track foreign remittances, compare bank receipts, and keep records for tax filing.
           </p>
-        </div>
-
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-semibold self-start sm:self-auto">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>FEMA Realisation Monitor</span>
         </div>
       </div>
 

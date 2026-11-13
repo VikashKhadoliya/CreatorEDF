@@ -45,7 +45,7 @@ export default function DownloadsPage() {
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
           <h3 className="font-bold text-navy-800 text-sm">Download Archive</h3>
-          <span className="text-xs text-slate-400">{downloads.length} files in IndexedDB</span>
+          <span className="text-xs text-slate-400">{downloads.length} files saved</span>
         </div>
 
         <div className="divide-y divide-slate-100">

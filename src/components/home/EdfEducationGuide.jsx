@@ -331,11 +331,6 @@ export function EdfEducationGuide() {
           ========================================================================= */}
       <div className="bg-gradient-to-b from-white via-teal-50/30 to-white dark:from-slate-900 dark:via-teal-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-4k-card ring-1 ring-slate-900/5 dark:ring-white/5 space-y-8">
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 dark:bg-teal-950/80 border border-teal-200/80 dark:border-teal-800 text-xs font-bold text-teal-700 dark:text-teal-300">
-            <BookOpen className="w-3.5 h-3.5 text-teal-500" />
-            <span>Complete Beginner&apos;s Compliance Manual</span>
-          </div>
-
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             EDF Kya Hai Aur Ise Kahan Submit Karein?
           </h2>
@@ -418,7 +413,7 @@ export function EdfEducationGuide() {
             ========================================================================= */}
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-inner">
           <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 text-center sm:text-left">
-            Standard Operating Flow for Indian Exporters
+            How the Process Works
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 relative">
@@ -460,14 +455,11 @@ export function EdfEducationGuide() {
         <div className="space-y-4 pt-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <span className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">
-                Step-by-Step Practical Manual
-              </span>
               <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
-                Interactive EDF Submission Walkthrough
+                Step-by-Step Submission Guide
               </h3>
             </div>
-            <span className="text-xs text-slate-400">Select any step to inspect details</span>
+            <span className="text-xs text-slate-400">Select any step to view details</span>
           </div>
 
           {/* Step Navigation Tabs */}
@@ -498,9 +490,6 @@ export function EdfEducationGuide() {
               {/* Left Column: Explanations */}
               <div className="lg:col-span-8 space-y-4">
                 <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/80 text-[11px] font-bold text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800">
-                    <span>{currentStepData.badge}</span>
-                  </div>
                   <h4 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
                     STEP {currentStepData.id} — {currentStepData.title}
                   </h4>
@@ -564,3 +553,4 @@ export function EdfEducationGuide() {
     </section>
   );
 }
+

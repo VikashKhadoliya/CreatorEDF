@@ -48,10 +48,6 @@ export default function GuidesPage() {
       {/* Header Card with 3D Manuals Illustration */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 text-xs font-semibold">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Creator Knowledge & Help</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Simple Compliance Guides for Indian Creators
           </h1>

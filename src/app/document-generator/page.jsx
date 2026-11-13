@@ -195,9 +195,6 @@ export default function DocumentGeneratorPage() {
             />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 text-[11px] font-semibold mb-1">
-              <span>Client-Side Document Engine</span>
-            </div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Export Document Generator
             </h1>

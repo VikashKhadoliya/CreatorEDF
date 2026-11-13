@@ -55,19 +55,14 @@ export default function ExporterProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="border-b border-slate-200 pb-5">
         <div>
           <h1 className="text-2xl font-bold text-navy-800 tracking-tight">
-            Exporter & Supplier Profile
+            Exporter Profile
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Configure your legal creator identity, tax registrations, and bank details. Stored 100% locally in your browser.
+            Enter your details for Form EDF, Export Invoices, and bank letters. Information stays on your device.
           </p>
-        </div>
-
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-navy-800 font-medium self-start sm:self-auto">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Local IndexedDB Only</span>
         </div>
       </div>
 

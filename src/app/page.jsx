@@ -35,12 +35,6 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* Left Column: Headline & CTA */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Creator Badge (Clean teal/slate token without flag emojis or saffron) */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/80 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                <span>{t("heroBadge")}</span>
-              </div>
-
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12]">
                 {t("heroTitleLine1")} <br />
@@ -168,11 +162,7 @@ export default function HomePage() {
           2. MAIN TOOLS SECTION: 3 PROMINENT CARDS WITH ORIGINAL 3D ART (4K Studio)
           ========================================================================= */}
       <section id="tools" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="text-center space-y-2.5 max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 text-[11px] font-bold text-teal-700 dark:text-teal-300">
-            <Sparkles className="w-3.5 h-3.5 text-teal-500" />
-            <span>{t("toolsSectionLabel")}</span>
-          </div>
+        <div className="text-center space-y-2 max-w-2xl mx-auto mb-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {t("toolsSectionTitle")}
           </h2>
@@ -297,9 +287,6 @@ export default function HomePage() {
           {/* Left Side: 3-Step Process (7 cols) */}
           <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-4k-card flex flex-col justify-between ring-1 ring-slate-900/5 dark:ring-white/5">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-3">
-                <span>Simple 3-Step Flow</span>
-              </div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {t("howTitle")}
               </h3>
@@ -394,9 +381,6 @@ export default function HomePage() {
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
                     {t("guidesCardTitle")}
                   </h3>
-                  <span className="text-[11px] text-teal-700 dark:text-teal-400 font-semibold">
-                    Indian Regulatory Compliance
-                  </span>
                 </div>
               </div>
 
@@ -449,11 +433,6 @@ export default function HomePage() {
 
             {/* Right Information & Guarantees */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-950/80 border border-teal-700/60 text-teal-400 text-xs font-semibold shadow-2xs">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>100% In-Browser Privacy Architecture</span>
-              </div>
-
               <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
                 Your Financial Data Never Leaves Your Device
               </h3>
@@ -468,8 +447,8 @@ export default function HomePage() {
                     <Lock className="w-4 h-4 text-teal-400" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold block text-white">Local IndexedDB Storage</span>
-                    <span className="text-[11px] text-slate-400 leading-normal">Profiles are saved only in your local browser sandbox.</span>
+                    <span className="text-xs font-bold block text-white">Saved in your browser</span>
+                    <span className="text-[11px] text-slate-400 leading-normal">Your information is saved only on your device.</span>
                   </div>
                 </div>
 
@@ -478,8 +457,8 @@ export default function HomePage() {
                     <Cpu className="w-4 h-4 text-teal-400" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold block text-white">Client-Side PDF Engine</span>
-                    <span className="text-[11px] text-slate-400 leading-normal">PDFs are compiled locally in memory and downloaded directly.</span>
+                    <span className="text-xs font-bold block text-white">Direct PDF download</span>
+                    <span className="text-[11px] text-slate-400 leading-normal">Documents are created locally and downloaded directly.</span>
                   </div>
                 </div>
               </div>

@@ -93,15 +93,11 @@ export function FindNextStepWizard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 text-[11px] font-bold text-teal-700 dark:text-teal-300 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-teal-500" />
-            <span>Interactive Diagnostic Tool</span>
-          </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Find My Next Step: Interactive EDF Advisor
+            Find Your Next Step
           </h3>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Answer 4 simple questions to receive customized regulatory guidance and questions for your bank.
+            Answer 4 simple questions to see what to prepare and what to ask your bank.
           </p>
         </div>
 
@@ -580,3 +576,4 @@ export function FindNextStepWizard() {
     </div>
   );
 }
+

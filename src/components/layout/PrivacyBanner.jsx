@@ -35,7 +35,7 @@ export function PrivacyBanner() {
           <div className="flex-1 space-y-1.5">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5">
-                <span>100% In-Browser Privacy</span>
+                <span>Privacy Notice</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
               </h4>
               <button

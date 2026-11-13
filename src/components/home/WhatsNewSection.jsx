@@ -14,16 +14,12 @@ export function WhatsNewSection() {
       <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-4k-card ring-1 ring-slate-900/5 dark:ring-white/5 space-y-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 text-[11px] font-bold text-teal-700 dark:text-teal-300">
-              <History className="w-3.5 h-3.5 text-teal-500" />
-              <span>Release History & Platform Changelog</span>
-            </div>
+          <div className="space-y-1">
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               What&apos;s New at CreatorEDF
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              A transparent, chronological record of actual feature releases, PDF engine updates, and regulatory compliance improvements.
+              Recent updates, document fixes, and feature additions.
             </p>
           </div>
 
@@ -115,3 +111,4 @@ export function WhatsNewSection() {
     </section>
   );
 }
+

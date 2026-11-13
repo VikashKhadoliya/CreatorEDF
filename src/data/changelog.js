@@ -8,24 +8,24 @@ export const changelogEntries = [
   {
     version: "v2.5.0",
     date: "November 13, 2026",
-    title: "EDF Education & Submission Guide + Interactive Next Step Finder",
-    category: "Regulatory & Education",
+    title: "EDF Education & Submission Guide + Next Step Finder",
+    category: "Education & Compliance",
     tagColor: "teal",
-    description: "Added a comprehensive, beginner-friendly EDF Education & Submission Guide explaining RBI Form EDF, export classification, DTA vs SEZ authorities, and deemed submission conditions under RBI Notification (FEMA Export of Goods and Services Regulations). Included an interactive 'Find My Next Step' diagnostic tool and regulatory citations.",
+    description: "Added a step-by-step EDF Education & Submission Guide explaining RBI Form EDF, export classification, DTA vs SEZ authorities, and deemed submission rules. Included a practical 'Find Your Next Step' guide and bank question checklist.",
     highlights: [
       "Bilingual explanation (English & Hindi) of Form EDF and export realization",
       "5-Step Submission Guide covering software vs non-software export authorities",
-      "Interactive 'Find My Next Step' wizard with custom bank questioning checklist",
+      "Interactive 'Find Your Next Step' guide with custom bank question checklist",
       "Official RBI Notification reference citations and last-reviewed tracking"
     ]
   },
   {
     version: "v2.4.0",
     date: "November 13, 2026",
-    title: "4K Ultra-HD Studio Finish & In-Browser Cookie Privacy Toast",
+    title: "4K Ultra-HD Finish & In-Browser Cookie Privacy Toast",
     category: "Design & UX",
     tagColor: "navy",
-    description: "Upgraded the visual architecture to a 4K Ultra-HD studio aesthetic with subpixel font smoothing, ambient glow lighting, micro-grid backdrop, and multi-tier depth shadows. Converted top alert into a sleek floating in-browser privacy cookie toast.",
+    description: "Upgraded to a 4K Ultra-HD finish with crisp typography, ambient glow lighting, micro-grid backdrop, and refined depth shadows. Converted top alert into a sleek floating in-browser privacy cookie toast.",
     highlights: [
       "Subpixel text antialiasing with refined letter tracking (-0.025em)",
       "Ambient teal mesh glow and 24px micro-grid background textures",
@@ -86,3 +86,4 @@ export const changelogEntries = [
     ]
   }
 ];
+
