@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+}
+
+.dark {
+  --background: #080D1A;
+  --foreground: #F8FAFC;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.011em;
+}
+
+/* 4K Ultra-HD Crisp Typography Tracking */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+}
+
+/* Ultra-HD Mesh Glow & Subtle Studio Grid */
+.bg-ambient-glow {
+  background-image: 
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(20, 184, 166, 0.12), transparent 70%);
+}
+
+.dark .bg-ambient-glow {
+  background-image: 
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(20, 184, 166, 0.16), transparent 70%);
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark .bg-dot-matrix {
+  background-image: radial-gradient(rgba(248, 250, 252, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 4K Studio Glassmorphism & Multi-Tier Shadows */
+.glass-panel-hd {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel-hd {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+.shadow-4k-card {
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.03),
+    0 20px 32px -8px rgba(15, 23, 42, 0.05);
+}
+
+.dark .shadow-4k-card {
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 24px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+.shadow-4k-glow {
+  box-shadow: 
+    0 20px 50px -12px rgba(20, 184, 166, 0.2),
+    0 0 0 1px rgba(20, 184, 166, 0.1);
+}
+
+/* Custom smooth scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
