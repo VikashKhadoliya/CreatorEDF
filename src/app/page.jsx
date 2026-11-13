@@ -21,6 +21,7 @@ import { AdSlot } from "@/components/ads/AdSlot";
 import { EdfEducationGuide } from "@/components/home/EdfEducationGuide";
 import { FindNextStepWizard } from "@/components/home/FindNextStepWizard";
 import { WhatsNewSection } from "@/components/home/WhatsNewSection";
+import { AdSenseIcon, YouTubeIcon, MetaIcon } from "@/components/ui/PlatformIcons";
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -109,25 +110,25 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Supported Platform Chips (4K Glassmorphic styling) */}
-              <div className="mt-5 w-full flex flex-wrap items-center justify-center gap-2 px-2 z-10">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-200">
-                  <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+              {/* Supported Platform Chips with Authentic Official Brand SVGs */}
+              <div className="mt-5 w-full flex flex-wrap items-center justify-center gap-2.5 px-2 z-10">
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:shadow-xs transition-all text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  <AdSenseIcon className="w-4 h-4 shrink-0" />
                   <span>Google AdSense</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-200">
-                  <span className="w-2 h-2 rounded-full bg-slate-800 dark:bg-slate-300"></span>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:shadow-xs transition-all text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  <YouTubeIcon className="w-4 h-4 shrink-0" />
                   <span>YouTube</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-200">
-                  <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:shadow-xs transition-all text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  <MetaIcon className="w-4 h-4 shrink-0" />
                   <span>Meta</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400">
-                  <Globe className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:shadow-xs transition-all text-xs font-medium text-slate-600 dark:text-slate-400">
+                  <Globe className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
                   <span>Other Platforms</span>
                 </div>
               </div>
