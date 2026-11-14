@@ -20,6 +20,10 @@ import {
   formatTradeDocumentDate,
   computeStatutoryDeadline,
   validateDocumentInputs,
+  validateEdfInputs,
+  validateInvoiceInputs,
+  validateAdLetterInputs,
+  validateZipBundleInputs,
 } from "@/lib/calculations";
 import {
   generateEdfFormPdf,
@@ -97,6 +101,8 @@ export default function DocumentGeneratorPage() {
   // UI State
   const [activeTab, setActiveTab] = useState("edf");
   const [validationErrors, setValidationErrors] = useState([]);
+  const [validationTargetName, setValidationTargetName] = useState("");
+  const [highlightedFields, setHighlightedFields] = useState(new Set());
   const [downloadSuccessMessage, setDownloadSuccessMessage] = useState("");
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
   const [hasSavedProfile, setHasSavedProfile] = useState(false);
@@ -157,10 +163,45 @@ export default function DocumentGeneratorPage() {
     init();
   }, []);
 
+  // Clear field highlight on user input
+  const clearHighlight = (fieldId) => {
+    setHighlightedFields((prev) => {
+      if (!prev.has(fieldId)) return prev;
+      const next = new Set(prev);
+      next.delete(fieldId);
+      return next;
+    });
+  };
+
+  // Focus and scroll to first invalid field
+  const focusAndScrollToField = (fieldId) => {
+    if (!fieldId) return;
+    const el = document.getElementById(fieldId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => {
+        try {
+          el.focus();
+        } catch (e) {}
+      }, 250);
+    }
+  };
+
+  // Dynamic input border and highlight styling
+  const inputClass = (fieldId, extra = "") => {
+    const isInvalid = highlightedFields.has(fieldId);
+    return `w-full text-xs px-3 py-2 rounded-xl border transition ${
+      isInvalid
+        ? "border-rose-500 ring-2 ring-rose-400/80 dark:ring-rose-800 bg-rose-50/40 dark:bg-rose-950/30 text-rose-950 dark:text-rose-100 font-medium"
+        : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+    } ${extra}`;
+  };
+
   // Handle Recipient selection from standard platform list or custom entry
   const handleRecipientSelect = (e) => {
     const val = e.target.value;
     setSelectedRecipientId(val);
+    clearHighlight("selectedRecipientId");
 
     if (!val) {
       setRecipientName("");
@@ -181,6 +222,9 @@ export default function DocumentGeneratorPage() {
       setRecipientName(matched.name || "");
       setRecipientAddress(matched.address || "");
       setRecipientCountry(matched.country || "");
+      clearHighlight("recipientName");
+      clearHighlight("recipientAddress");
+      clearHighlight("recipientCountry");
     }
   };
 
@@ -188,9 +232,11 @@ export default function DocumentGeneratorPage() {
   const handleSacSelect = (e) => {
     const val = e.target.value;
     setSacCode(val);
+    clearHighlight("sacCode");
     const matched = SAC_LIBRARY.find((s) => s.code === val);
     if (matched && !serviceDescription) {
       setServiceDescription(matched.name);
+      clearHighlight("serviceDescription");
     }
   };
 
@@ -259,12 +305,22 @@ export default function DocumentGeneratorPage() {
     declarationDate,
   ]);
 
-  // Real-time validation status
-  const validationResult = useMemo(() => {
-    return validateDocumentInputs(documentData);
-  }, [documentData]);
+  // Real-time document-specific validation status
+  const edfValidation = useMemo(() => validateEdfInputs(documentData), [documentData]);
+  const invoiceValidation = useMemo(() => validateInvoiceInputs(documentData), [documentData]);
+  const adLetterValidation = useMemo(() => validateAdLetterInputs(documentData), [documentData]);
+  const zipValidation = useMemo(() => validateZipBundleInputs(documentData), [documentData]);
 
-  const isFormValid = validationResult.isValid;
+  // Active tab validation status
+  const activeValidation = useMemo(() => {
+    if (activeTab === "edf") return edfValidation;
+    if (activeTab === "invoice") return invoiceValidation;
+    if (activeTab === "ad_letter") return adLetterValidation;
+    return edfValidation;
+  }, [activeTab, edfValidation, invoiceValidation, adLetterValidation]);
+
+  // Overall form validity
+  const isFormValid = zipValidation.isValid;
 
   // Real-time calculations
   const numAmount = parseFloat(invoiceAmount) || 0;
@@ -329,13 +385,25 @@ export default function DocumentGeneratorPage() {
     }, 1500);
   };
 
+  // Handle validation failures cleanly
+  const handleValidationFailure = (validation, targetName) => {
+    setValidationErrors(validation.errors);
+    setValidationTargetName(targetName);
+    const set = new Set(validation.errors.map((e) => e.field));
+    setHighlightedFields(set);
+    if (validation.errors.length > 0) {
+      focusAndScrollToField(validation.errors[0].field);
+    }
+  };
+
   // Format-aware EDF Download (PDF & High-Res PNG)
   const handleDownloadEdf = async (format = "pdf") => {
-    if (!isFormValid) {
-      setValidationErrors(validationResult.errors);
+    if (!edfValidation.isValid) {
+      handleValidationFailure(edfValidation, "RBI Form EDF");
       return;
     }
     setValidationErrors([]);
+    setHighlightedFields(new Set());
 
     if (format === "png") {
       try {
@@ -378,11 +446,12 @@ export default function DocumentGeneratorPage() {
 
   // Format-aware Invoice Download (PDF & High-Res PNG)
   const handleDownloadInvoice = async (format = "pdf") => {
-    if (!isFormValid) {
-      setValidationErrors(validationResult.errors);
+    if (!invoiceValidation.isValid) {
+      handleValidationFailure(invoiceValidation, "Export Invoice");
       return;
     }
     setValidationErrors([]);
+    setHighlightedFields(new Set());
 
     if (format === "png") {
       try {
@@ -425,11 +494,12 @@ export default function DocumentGeneratorPage() {
 
   // Format-aware AD Code Letter Download (PDF & High-Res PNG)
   const handleDownloadAdLetter = async (format = "pdf") => {
-    if (!isFormValid) {
-      setValidationErrors(validationResult.errors);
+    if (!adLetterValidation.isValid) {
+      handleValidationFailure(adLetterValidation, "AD Code Request Letter");
       return;
     }
     setValidationErrors([]);
+    setHighlightedFields(new Set());
 
     if (format === "png") {
       try {
@@ -472,11 +542,12 @@ export default function DocumentGeneratorPage() {
 
   // Combined ZIP Package Download (All 3 PDFs)
   const handleDownloadZipBundle = async () => {
-    if (!isFormValid) {
-      setValidationErrors(validationResult.errors);
+    if (!zipValidation.isValid) {
+      handleValidationFailure(zipValidation, "All 3 Documents (ZIP Package)");
       return;
     }
     setValidationErrors([]);
+    setHighlightedFields(new Set());
     try {
       setIsExporting("zip");
       const zipBlob = await generateCombinedComplianceZip(documentData);
@@ -526,24 +597,31 @@ export default function DocumentGeneratorPage() {
         {/* Global Batch Download ZIP Button */}
         <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
           <button
+            type="button"
             onClick={handleDownloadZipBundle}
-            disabled={!isFormValid || Boolean(isExporting)}
-            className={`w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition shadow-md shrink-0 ${
-              isFormValid && !isExporting
-                ? "bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white shadow-teal-600/20 cursor-pointer"
-                : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
+            disabled={Boolean(isExporting)}
+            className={`w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition shadow-md shrink-0 cursor-pointer ${
+              zipValidation.isValid && !isExporting
+                ? "bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white shadow-teal-600/20"
+                : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700"
             }`}
+            title={zipValidation.isValid ? "Download all 3 PDFs in a single ZIP package" : "Click to view required fields"}
           >
             {isExporting === "zip" ? (
               <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
             ) : (
-              <Archive className="w-4 h-4" />
+              <Archive className={`w-4 h-4 ${zipValidation.isValid ? "text-white" : "text-teal-600 dark:text-teal-400"}`} />
             )}
             <span>{isExporting === "zip" ? "Compressing Package..." : "Download All 3 Documents (ZIP)"}</span>
+            {!zipValidation.isValid && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-semibold">
+                Fields Required
+              </span>
+            )}
           </button>
-          {!isFormValid && (
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 text-center md:text-right">
-              Complete required details to enable downloads
+          {!zipValidation.isValid && (
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 text-center md:text-right">
+              Click button to inspect any missing fields
             </span>
           )}
         </div>
@@ -551,16 +629,60 @@ export default function DocumentGeneratorPage() {
 
       {/* Validation Errors Notice */}
       {validationErrors.length > 0 && (
-        <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 rounded-2xl p-4 text-xs text-rose-900 dark:text-rose-200 space-y-1.5 animate-in fade-in">
-          <div className="flex items-center gap-2 font-bold text-rose-800 dark:text-rose-300">
-            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-            <span>Please complete the required details before downloading:</span>
+        <div
+          id="validation-errors-banner"
+          className="bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-400 dark:border-rose-800 rounded-3xl p-5 sm:p-6 text-xs text-rose-950 dark:text-rose-100 space-y-3.5 shadow-md animate-in fade-in"
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-rose-200 dark:border-rose-800/80 pb-3">
+            <div className="flex items-center gap-2.5 font-bold text-sm text-rose-800 dark:text-rose-200">
+              <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>
+                Please complete these required fields to download {validationTargetName || "document"}:
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setValidationErrors([])}
+              className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200 underline shrink-0 cursor-pointer"
+            >
+              Dismiss
+            </button>
           </div>
-          <ul className="list-disc pl-6 space-y-0.5 text-rose-700 dark:text-rose-300">
+
+          <div className="divide-y divide-rose-200 dark:divide-rose-800/60">
             {validationErrors.map((err, i) => (
-              <li key={i}>{err}</li>
+              <div
+                key={i}
+                onClick={() => focusAndScrollToField(err.field)}
+                className="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer hover:bg-rose-100/60 dark:hover:bg-rose-900/30 px-2 rounded-xl transition"
+              >
+                <div className="space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-rose-950 dark:text-rose-100">
+                      {err.fieldName}
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-200/80 dark:bg-rose-900/80 text-rose-800 dark:text-rose-200">
+                      {err.section}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-rose-700 dark:text-rose-300">
+                    <span className="font-semibold">Reason:</span> {err.reason}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    focusAndScrollToField(err.field);
+                  }}
+                  className="text-[11px] font-bold text-teal-700 dark:text-teal-300 hover:underline inline-flex items-center gap-1 shrink-0 self-start sm:self-center cursor-pointer"
+                >
+                  <span>Go to field</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
@@ -604,54 +726,71 @@ export default function DocumentGeneratorPage() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="exporterName" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Legal Name / Trade Name <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="exporterName"
                   type="text"
                   value={exporterName}
-                  onChange={(e) => setExporterName(e.target.value)}
+                  onChange={(e) => {
+                    setExporterName(e.target.value);
+                    clearHighlight("exporterName");
+                  }}
                   placeholder="e.g. Rahul Sharma"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("exporterName")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="exporterAddress" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Complete Registered Address <span className="text-rose-500">*</span>
                 </label>
                 <textarea
+                  id="exporterAddress"
                   rows={2}
                   value={exporterAddress}
-                  onChange={(e) => setExporterAddress(e.target.value)}
+                  onChange={(e) => {
+                    setExporterAddress(e.target.value);
+                    clearHighlight("exporterAddress");
+                  }}
                   placeholder="e.g. 104, Green Heights, Ring Road, Jaipur, Rajasthan - 302015"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                  className={inputClass("exporterAddress", "resize-none")}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="exporterPan" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Permanent Account Number (PAN) <span className="text-rose-500">*</span>
                   </label>
                   <input
+                    id="exporterPan"
                     type="text"
                     maxLength={10}
+                    autoCapitalize="characters"
                     value={exporterPan}
-                    onChange={(e) => setExporterPan(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setExporterPan(e.target.value.toUpperCase());
+                      clearHighlight("exporterPan");
+                    }}
                     placeholder="ABCDE1234F"
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className={inputClass("exporterPan", "font-mono uppercase")}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="exporterType" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Exporter Classification
                   </label>
                   <select
+                    id="exporterType"
                     value={exporterType}
-                    onChange={(e) => setExporterType(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    onChange={(e) => {
+                      setExporterType(e.target.value);
+                      clearHighlight("exporterType");
+                    }}
+                    className={inputClass("exporterType")}
                   >
                     <option value="resident_individual">Resident Individual</option>
                     <option value="non_individual">Business (LLP / Pvt Ltd)</option>
@@ -661,13 +800,17 @@ export default function DocumentGeneratorPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="gstStatus" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     GST Status
                   </label>
                   <select
+                    id="gstStatus"
                     value={gstStatus}
-                    onChange={(e) => setGstStatus(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    onChange={(e) => {
+                      setGstStatus(e.target.value);
+                      clearHighlight("gstStatus");
+                    }}
+                    className={inputClass("gstStatus")}
                   >
                     <option value="unregistered">Unregistered Exporter</option>
                     <option value="lut_active">Registered with LUT</option>
@@ -676,17 +819,25 @@ export default function DocumentGeneratorPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="gstin" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     GSTIN {gstStatus !== "unregistered" && <span className="text-rose-500">*</span>}
                   </label>
                   <input
+                    id="gstin"
                     type="text"
                     maxLength={15}
+                    autoCapitalize="characters"
                     value={gstin}
-                    onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setGstin(e.target.value.toUpperCase());
+                      clearHighlight("gstin");
+                    }}
                     placeholder={gstStatus === "unregistered" ? "Not Registered" : "08AAAAA0000A1Z5"}
                     disabled={gstStatus === "unregistered"}
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 disabled:bg-slate-50 dark:disabled:bg-slate-900/40 text-slate-800 dark:text-slate-100 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className={inputClass(
+                      "gstin",
+                      "font-mono uppercase disabled:bg-slate-50 dark:disabled:bg-slate-900/40"
+                    )}
                   />
                 </div>
               </div>
@@ -694,27 +845,36 @@ export default function DocumentGeneratorPage() {
               {gstStatus === "lut_active" && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="lutArn" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       LUT ARN
                     </label>
                     <input
+                      id="lutArn"
                       type="text"
+                      autoCapitalize="characters"
                       value={lutArn}
-                      onChange={(e) => setLutArn(e.target.value.toUpperCase())}
+                      onChange={(e) => {
+                        setLutArn(e.target.value.toUpperCase());
+                        clearHighlight("lutArn");
+                      }}
                       placeholder="AD080326000000X"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("lutArn", "font-mono uppercase")}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="lutFinancialYear" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Financial Year
                     </label>
                     <input
+                      id="lutFinancialYear"
                       type="text"
                       value={lutFinancialYear}
-                      onChange={(e) => setLutFinancialYear(e.target.value)}
+                      onChange={(e) => {
+                        setLutFinancialYear(e.target.value);
+                        clearHighlight("lutFinancialYear");
+                      }}
                       placeholder="2026-27"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("lutFinancialYear", "font-mono")}
                     />
                   </div>
                 </div>
@@ -728,44 +888,56 @@ export default function DocumentGeneratorPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="bankName" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Bank Name <span className="text-rose-500">*</span>
                     </label>
                     <input
+                      id="bankName"
                       type="text"
                       value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
+                      onChange={(e) => {
+                        setBankName(e.target.value);
+                        clearHighlight("bankName");
+                      }}
                       placeholder="e.g. HDFC Bank, ICICI Bank"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("bankName")}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="bankBranch" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Forex Branch &amp; City <span className="text-rose-500">*</span>
                     </label>
                     <input
+                      id="bankBranch"
                       type="text"
                       value={bankBranch}
-                      onChange={(e) => setBankBranch(e.target.value)}
+                      onChange={(e) => {
+                        setBankBranch(e.target.value);
+                        clearHighlight("bankBranch");
+                      }}
                       placeholder="e.g. M.I. Road, Jaipur"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("bankBranch")}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="adCode" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Bank AD Code <span className="text-rose-500">*</span>
                     </label>
                     <input
+                      id="adCode"
                       type="text"
                       maxLength={14}
                       value={adCode}
-                      onChange={(e) => setAdCode(e.target.value.trim())}
+                      onChange={(e) => {
+                        setAdCode(e.target.value.trim());
+                        clearHighlight("adCode");
+                      }}
                       placeholder="e.g. 0510008"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("adCode", "font-mono")}
                     />
                     <span className="text-[10px] text-slate-400 block mt-0.5">
                       Confirm 7-14 character code with your bank branch
@@ -773,44 +945,58 @@ export default function DocumentGeneratorPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Bank Account Number
+                    <label htmlFor="accountNumber" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Bank Account Number <span className="text-rose-500">*</span>
                     </label>
                     <input
+                      id="accountNumber"
                       type="text"
+                      inputMode="numeric"
                       value={accountNumber}
-                      onChange={(e) => setAccountNumber(e.target.value.trim())}
+                      onChange={(e) => {
+                        setAccountNumber(e.target.value.trim());
+                        clearHighlight("accountNumber");
+                      }}
                       placeholder="e.g. 50100012345678"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("accountNumber", "font-mono")}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="ifscCode" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Bank IFSC Code
                     </label>
                     <input
+                      id="ifscCode"
                       type="text"
                       maxLength={11}
+                      autoCapitalize="characters"
                       value={ifscCode}
-                      onChange={(e) => setIfscCode(e.target.value.toUpperCase().trim())}
+                      onChange={(e) => {
+                        setIfscCode(e.target.value.toUpperCase().trim());
+                        clearHighlight("ifscCode");
+                      }}
                       placeholder="e.g. HDFC0000051"
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("ifscCode", "font-mono uppercase")}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    <label htmlFor="authorisedSignatory" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Authorised Signatory
                     </label>
                     <input
+                      id="authorisedSignatory"
                       type="text"
                       value={authorisedSignatory}
-                      onChange={(e) => setAuthorisedSignatory(e.target.value)}
+                      onChange={(e) => {
+                        setAuthorisedSignatory(e.target.value);
+                        clearHighlight("authorisedSignatory");
+                      }}
                       placeholder={exporterName || "Your Full Name"}
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className={inputClass("authorisedSignatory")}
                     />
                   </div>
                 </div>
@@ -827,13 +1013,14 @@ export default function DocumentGeneratorPage() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="selectedRecipientId" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Choose Known Platform or Enter Custom
                 </label>
                 <select
+                  id="selectedRecipientId"
                   value={selectedRecipientId}
                   onChange={handleRecipientSelect}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("selectedRecipientId")}
                 >
                   <option value="">-- Choose or Enter Custom Payer --</option>
                   {recipients.map((r) => (
@@ -846,42 +1033,54 @@ export default function DocumentGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="recipientName" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Payer Company Name <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="recipientName"
                   type="text"
                   value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
+                  onChange={(e) => {
+                    setRecipientName(e.target.value);
+                    clearHighlight("recipientName");
+                  }}
                   placeholder="e.g. Google Asia Pacific Pte. Ltd."
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("recipientName")}
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-1">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="recipientCountry" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Country of Destination <span className="text-rose-500">*</span>
                   </label>
                   <input
+                    id="recipientCountry"
                     type="text"
                     value={recipientCountry}
-                    onChange={(e) => setRecipientCountry(e.target.value)}
+                    onChange={(e) => {
+                      setRecipientCountry(e.target.value);
+                      clearHighlight("recipientCountry");
+                    }}
                     placeholder="e.g. Singapore, Ireland, United States"
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className={inputClass("recipientCountry")}
                   />
                 </div>
 
                 <div className="sm:col-span-1">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="recipientAddress" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Full Payer Address <span className="text-rose-500">*</span>
                   </label>
                   <textarea
+                    id="recipientAddress"
                     rows={2}
                     value={recipientAddress}
-                    onChange={(e) => setRecipientAddress(e.target.value)}
+                    onChange={(e) => {
+                      setRecipientAddress(e.target.value);
+                      clearHighlight("recipientAddress");
+                    }}
                     placeholder="e.g. 70 Pasir Panjang Road, #03-01, Mapletree Business City II, Singapore 117371"
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                    className={inputClass("recipientAddress", "resize-none")}
                   />
                 </div>
               </div>
@@ -897,39 +1096,51 @@ export default function DocumentGeneratorPage() {
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="invoiceNumber" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Invoice Number <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="invoiceNumber"
                   type="text"
                   maxLength={16}
                   value={invoiceNumber}
-                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  onChange={(e) => {
+                    setInvoiceNumber(e.target.value);
+                    clearHighlight("invoiceNumber");
+                  }}
                   placeholder="e.g. INV-2026-01"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("invoiceNumber", "font-mono")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="invoiceDate" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Invoice Date <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="invoiceDate"
                   type="date"
                   value={invoiceDate}
-                  onChange={(e) => setInvoiceDate(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  onChange={(e) => {
+                    setInvoiceDate(e.target.value);
+                    clearHighlight("invoiceDate");
+                  }}
+                  className={inputClass("invoiceDate")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="currency" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Currency <span className="text-rose-500">*</span>
                 </label>
                 <select
+                  id="currency"
                   value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  onChange={(e) => {
+                    setCurrency(e.target.value);
+                    clearHighlight("currency");
+                  }}
+                  className={inputClass("currency")}
                 >
                   <option value="">-- Select Currency --</option>
                   <option value="USD">USD - US Dollar</option>
@@ -944,43 +1155,54 @@ export default function DocumentGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="invoiceAmount" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Invoice Amount <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="invoiceAmount"
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   min="0"
                   value={invoiceAmount}
-                  onChange={(e) => setInvoiceAmount(e.target.value)}
+                  onChange={(e) => {
+                    setInvoiceAmount(e.target.value);
+                    clearHighlight("invoiceAmount");
+                  }}
                   placeholder="e.g. 650.00"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("invoiceAmount", "font-mono")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="exchangeRate" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Exchange Rate (INR) <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="exchangeRate"
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   min="0"
                   value={exchangeRate}
-                  onChange={(e) => setExchangeRate(e.target.value)}
+                  onChange={(e) => {
+                    setExchangeRate(e.target.value);
+                    clearHighlight("exchangeRate");
+                  }}
                   placeholder="e.g. 86.50"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("exchangeRate", "font-mono")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="sacCode" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   SAC Code <span className="text-rose-500">*</span>
                 </label>
                 <select
+                  id="sacCode"
                   value={sacCode}
                   onChange={handleSacSelect}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className={inputClass("sacCode")}
                 >
                   <option value="">-- Select SAC Code --</option>
                   {SAC_LIBRARY.map((s) => (
@@ -993,15 +1215,19 @@ export default function DocumentGeneratorPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label htmlFor="serviceDescription" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Description of Services <span className="text-rose-500">*</span>
               </label>
               <input
+                id="serviceDescription"
                 type="text"
                 value={serviceDescription}
-                onChange={(e) => setServiceDescription(e.target.value)}
+                onChange={(e) => {
+                  setServiceDescription(e.target.value);
+                  clearHighlight("serviceDescription");
+                }}
                 placeholder="e.g. Digital advertising &amp; online video monetization"
-                className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className={inputClass("serviceDescription")}
               />
             </div>
           </div>
@@ -1085,17 +1311,21 @@ export default function DocumentGeneratorPage() {
                   if (activeTab === "invoice") handleDownloadInvoice("pdf");
                   if (activeTab === "ad_letter") handleDownloadAdLetter("pdf");
                 }}
-                disabled={!isFormValid || Boolean(isExporting)}
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition shadow-xs ${
-                  isFormValid && !isExporting
-                    ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                disabled={Boolean(isExporting)}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition shadow-xs cursor-pointer ${
+                  activeValidation.isValid && !isExporting
+                    ? "bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white shadow-teal-600/20"
+                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700"
                 }`}
+                title={activeValidation.isValid ? "Ready to download PDF" : "Click to view required fields for this document"}
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>
                   {activeTab === "edf" ? "EDF" : activeTab === "invoice" ? "Invoice" : "Letter"} (PDF)
                 </span>
+                {!activeValidation.isValid && (
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" title="Required fields needed" />
+                )}
               </button>
 
               <button
@@ -1105,12 +1335,13 @@ export default function DocumentGeneratorPage() {
                   if (activeTab === "invoice") handleDownloadInvoice("png");
                   if (activeTab === "ad_letter") handleDownloadAdLetter("png");
                 }}
-                disabled={!isFormValid || Boolean(isExporting)}
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition border ${
-                  isFormValid && !isExporting
-                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer shadow-2xs"
-                    : "bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                disabled={Boolean(isExporting)}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition border cursor-pointer ${
+                  activeValidation.isValid && !isExporting
+                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-2xs"
+                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/60 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                 }`}
+                title={activeValidation.isValid ? "Ready to download PNG" : "Click to view required fields for this document"}
               >
                 {isExporting?.endsWith("_png") ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
@@ -1120,6 +1351,9 @@ export default function DocumentGeneratorPage() {
                 <span>
                   {isExporting?.endsWith("_png") ? "Exporting..." : "Download PNG"}
                 </span>
+                {!activeValidation.isValid && (
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" title="Required fields needed" />
+                )}
               </button>
             </div>
           </div>

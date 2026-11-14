@@ -1,4 +1,4 @@
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
 
 /**
  * Capture an HTML DOM element and trigger a browser download of a high-resolution PNG image.
@@ -6,7 +6,7 @@ import { toPng } from "html-to-image";
  * @param {HTMLElement} element - The DOM element to capture.
  * @param {string} fileName - The desired download filename (e.g. CreatorEDF_EDF_Form.png).
  * @param {object} options - Optional configuration overrides.
- * @returns {Promise<string>} - Resolves with data URL on success.
+ * @returns {Promise<Blob>} - Resolves with Blob on success.
  */
 export async function exportElementToPng(element, fileName = "document.png", options = {}) {
   if (!element) {
@@ -34,16 +34,28 @@ export async function exportElementToPng(element, fileName = "document.png", opt
   };
 
   try {
-    const dataUrl = await toPng(element, defaultOptions);
+    const blob = await toBlob(element, defaultOptions);
+    if (!blob) {
+      throw new Error("Failed to generate image blob.");
+    }
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+    link.style.display = "none";
     link.download = fileName;
-    link.href = dataUrl;
+    link.href = url;
     document.body.appendChild(link);
     link.click();
     setTimeout(() => {
-      document.body.removeChild(link);
-    }, 1000);
-    return dataUrl;
+      try {
+        if (link.parentNode) {
+          document.body.removeChild(link);
+        }
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        // cleanup ignore
+      }
+    }, 2000);
+    return blob;
   } catch (error) {
     console.error("Failed to export PNG:", error);
     throw error;
