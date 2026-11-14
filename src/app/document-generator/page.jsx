@@ -308,6 +308,27 @@ export default function DocumentGeneratorPage() {
   const sanitizedInvoice = (invoiceNumber || "Form").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
   const sanitizedBank = (bankName || "Bank").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
 
+  // Bulletproof cross-platform download trigger helper (desktop, iOS, Android, webviews)
+  const triggerDownload = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try {
+        if (a.parentNode) {
+          a.parentNode.removeChild(a);
+        }
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        // cleanup safe guard
+      }
+    }, 1500);
+  };
+
   // Format-aware EDF Download (PDF & High-Res PNG)
   const handleDownloadEdf = async (format = "pdf") => {
     if (!isFormValid) {
@@ -322,7 +343,11 @@ export default function DocumentGeneratorPage() {
         const el = activeTab === "edf" ? edfPreviewRef.current : edfHiddenRef.current;
         const fileName = `CreatorEDF_EDF_Form_${sanitizedInvoice}.png`;
         await exportElementToPng(el, fileName);
-        await saveDownload({ documentType: "edf", format: "png", fileName, invoiceId: invoiceNumber });
+        try {
+          await saveDownload({ documentType: "edf", format: "png", fileName, invoiceId: invoiceNumber });
+        } catch (dbErr) {
+          console.warn("Could not archive download locally:", dbErr);
+        }
         notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
       } catch (err) {
         console.error("EDF PNG export failed:", err);
@@ -334,11 +359,21 @@ export default function DocumentGeneratorPage() {
     }
 
     // PDF format
-    const doc = generateEdfFormPdf(documentData);
-    const fileName = `CreatorEDF_EDF_Form_${sanitizedInvoice}.pdf`;
-    doc.save(fileName);
-    await saveDownload({ documentType: "edf", format: "pdf", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    try {
+      const doc = generateEdfFormPdf(documentData);
+      const blob = doc.output("blob");
+      const fileName = `CreatorEDF_EDF_Form_${sanitizedInvoice}.pdf`;
+      triggerDownload(blob, fileName);
+      try {
+        await saveDownload({ documentType: "edf", format: "pdf", fileName, invoiceId: invoiceNumber });
+      } catch (dbErr) {
+        console.warn("Could not archive download locally:", dbErr);
+      }
+      notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    } catch (err) {
+      console.error("EDF PDF generation failed:", err);
+      alert("Failed to generate EDF PDF. Please check your entered details.");
+    }
   };
 
   // Format-aware Invoice Download (PDF & High-Res PNG)
@@ -355,7 +390,11 @@ export default function DocumentGeneratorPage() {
         const el = activeTab === "invoice" ? invoicePreviewRef.current : invoiceHiddenRef.current;
         const fileName = `CreatorEDF_Export_Invoice_${sanitizedInvoice}.png`;
         await exportElementToPng(el, fileName);
-        await saveDownload({ documentType: "invoice", format: "png", fileName, invoiceId: invoiceNumber });
+        try {
+          await saveDownload({ documentType: "invoice", format: "png", fileName, invoiceId: invoiceNumber });
+        } catch (dbErr) {
+          console.warn("Could not archive download locally:", dbErr);
+        }
         notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
       } catch (err) {
         console.error("Invoice PNG export failed:", err);
@@ -367,11 +406,21 @@ export default function DocumentGeneratorPage() {
     }
 
     // PDF format
-    const doc = generateExportInvoicePdf(documentData);
-    const fileName = `CreatorEDF_Export_Invoice_${sanitizedInvoice}.pdf`;
-    doc.save(fileName);
-    await saveDownload({ documentType: "invoice", format: "pdf", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    try {
+      const doc = generateExportInvoicePdf(documentData);
+      const blob = doc.output("blob");
+      const fileName = `CreatorEDF_Export_Invoice_${sanitizedInvoice}.pdf`;
+      triggerDownload(blob, fileName);
+      try {
+        await saveDownload({ documentType: "invoice", format: "pdf", fileName, invoiceId: invoiceNumber });
+      } catch (dbErr) {
+        console.warn("Could not archive download locally:", dbErr);
+      }
+      notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    } catch (err) {
+      console.error("Invoice PDF generation failed:", err);
+      alert("Failed to generate Export Invoice PDF. Please check your entered details.");
+    }
   };
 
   // Format-aware AD Code Letter Download (PDF & High-Res PNG)
@@ -388,7 +437,11 @@ export default function DocumentGeneratorPage() {
         const el = activeTab === "ad_letter" ? adLetterPreviewRef.current : adLetterHiddenRef.current;
         const fileName = `CreatorEDF_AD_Code_Letter_${sanitizedBank}.png`;
         await exportElementToPng(el, fileName);
-        await saveDownload({ documentType: "ad_letter", format: "png", fileName, invoiceId: invoiceNumber });
+        try {
+          await saveDownload({ documentType: "ad_letter", format: "png", fileName, invoiceId: invoiceNumber });
+        } catch (dbErr) {
+          console.warn("Could not archive download locally:", dbErr);
+        }
         notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
       } catch (err) {
         console.error("AD Letter PNG export failed:", err);
@@ -400,11 +453,21 @@ export default function DocumentGeneratorPage() {
     }
 
     // PDF format
-    const doc = generateAdCodeLetterPdf(documentData);
-    const fileName = `CreatorEDF_AD_Code_Letter_${sanitizedBank}.pdf`;
-    doc.save(fileName);
-    await saveDownload({ documentType: "ad_letter", format: "pdf", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    try {
+      const doc = generateAdCodeLetterPdf(documentData);
+      const blob = doc.output("blob");
+      const fileName = `CreatorEDF_AD_Code_Letter_${sanitizedBank}.pdf`;
+      triggerDownload(blob, fileName);
+      try {
+        await saveDownload({ documentType: "ad_letter", format: "pdf", fileName, invoiceId: invoiceNumber });
+      } catch (dbErr) {
+        console.warn("Could not archive download locally:", dbErr);
+      }
+      notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
+    } catch (err) {
+      console.error("AD Code Letter PDF generation failed:", err);
+      alert("Failed to generate AD Code Letter PDF. Please check your entered details.");
+    }
   };
 
   // Combined ZIP Package Download (All 3 PDFs)
@@ -418,17 +481,12 @@ export default function DocumentGeneratorPage() {
       setIsExporting("zip");
       const zipBlob = await generateCombinedComplianceZip(documentData);
       const fileName = `CreatorEDF_All_Documents_${sanitizedInvoice}.zip`;
-      const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 1000);
-      await saveDownload({ documentType: "bundle", format: "zip", fileName, invoiceId: invoiceNumber });
+      triggerDownload(zipBlob, fileName);
+      try {
+        await saveDownload({ documentType: "bundle", format: "zip", fileName, invoiceId: invoiceNumber });
+      } catch (dbErr) {
+        console.warn("Could not archive download locally:", dbErr);
+      }
       notifySuccess(`Downloaded compliance package: ${fileName}`);
     } catch (err) {
       console.error("ZIP creation failed:", err);

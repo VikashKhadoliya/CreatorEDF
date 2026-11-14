@@ -193,16 +193,21 @@ export async function getDownloads() {
 }
 
 export async function saveDownload(downloadData) {
-  const db = await getDb();
-  if (!db) return null;
-  const id = downloadData.id || `dl_${Date.now()}`;
-  const data = {
-    ...downloadData,
-    id,
-    timestamp: new Date().toISOString(),
-  };
-  await db.put("document_downloads", data);
-  return data;
+  try {
+    const db = await getDb();
+    if (!db) return null;
+    const id = downloadData.id || `dl_${Date.now()}`;
+    const data = {
+      ...downloadData,
+      id,
+      timestamp: new Date().toISOString(),
+    };
+    await db.put("document_downloads", data);
+    return data;
+  } catch (err) {
+    console.warn("Local IndexedDB saveDownload failed (non-blocking):", err);
+    return null;
+  }
 }
 
 /**
