@@ -49,3 +49,4 @@ export async function exportElementToPng(element, fileName = "document.png", opt
     throw error;
   }
 }
+
