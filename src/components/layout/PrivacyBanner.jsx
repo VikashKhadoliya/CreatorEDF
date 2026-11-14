@@ -24,7 +24,7 @@ export function PrivacyBanner() {
   return (
     <aside
       aria-label="Privacy notice"
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 max-w-sm sm:max-w-md animate-in slide-in-from-bottom-5 fade-in duration-300"
+      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-50 max-w-sm sm:max-w-md animate-in slide-in-from-bottom-5 fade-in duration-300"
     >
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_20px_50px_rgba(15,23,42,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] rounded-2xl p-4 sm:p-5 ring-1 ring-slate-900/5 dark:ring-white/10">
         <div className="flex items-start gap-3.5">

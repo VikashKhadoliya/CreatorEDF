@@ -978,48 +978,48 @@ export default function DocumentGeneratorPage() {
         {/* Right Column: Interactive Document Previews & Single Downloads (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Tab Navigation & Individual Download Bar */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-2.5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            {/* Tabs */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-2.5 sm:p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Tabs (Horizontal scroll on mobile, flex on desktop) */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto scrollbar-none">
               <button
                 onClick={() => setActiveTab("edf")}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition ${
                   activeTab === "edf"
                     ? "bg-teal-600 text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <img src="/assets/tool-edf.png" alt="" className="w-4 h-4 object-contain rounded-xs" />
+                <img src="/assets/tool-edf.png" alt="" className="w-4 h-4 object-contain rounded-xs shrink-0" />
                 <span>1. Form EDF</span>
               </button>
 
               <button
                 onClick={() => setActiveTab("invoice")}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition ${
                   activeTab === "invoice"
                     ? "bg-teal-600 text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <img src="/assets/tool-invoice.png" alt="" className="w-4 h-4 object-contain rounded-xs" />
+                <img src="/assets/tool-invoice.png" alt="" className="w-4 h-4 object-contain rounded-xs shrink-0" />
                 <span>2. Export Invoice</span>
               </button>
 
               <button
                 onClick={() => setActiveTab("ad_letter")}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition ${
                   activeTab === "ad_letter"
                     ? "bg-teal-600 text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
-                <img src="/assets/tool-ad-code.png" alt="" className="w-4 h-4 object-contain rounded-xs" />
+                <img src="/assets/tool-ad-code.png" alt="" className="w-4 h-4 object-contain rounded-xs shrink-0" />
                 <span>3. AD Code Letter</span>
               </button>
             </div>
 
             {/* Action Bar for Active Document: Dual PDF & PNG Buttons */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center">
               <button
                 type="button"
                 onClick={() => {
@@ -1028,7 +1028,7 @@ export default function DocumentGeneratorPage() {
                   if (activeTab === "ad_letter") handleDownloadAdLetter("pdf");
                 }}
                 disabled={!isFormValid || Boolean(isExporting)}
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs transition shadow-xs ${
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition shadow-xs ${
                   isFormValid && !isExporting
                     ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
                     : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
@@ -1036,7 +1036,7 @@ export default function DocumentGeneratorPage() {
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>
-                  Download {activeTab === "edf" ? "EDF" : activeTab === "invoice" ? "Invoice" : "Letter"} (PDF)
+                  {activeTab === "edf" ? "EDF" : activeTab === "invoice" ? "Invoice" : "Letter"} (PDF)
                 </span>
               </button>
 
@@ -1048,7 +1048,7 @@ export default function DocumentGeneratorPage() {
                   if (activeTab === "ad_letter") handleDownloadAdLetter("png");
                 }}
                 disabled={!isFormValid || Boolean(isExporting)}
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs transition border ${
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-2 rounded-xl font-bold text-xs transition border ${
                   isFormValid && !isExporting
                     ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer shadow-2xs"
                     : "bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
@@ -1067,22 +1067,27 @@ export default function DocumentGeneratorPage() {
           </div>
 
           {/* Document Preview Frame (with Ref for Active Document) */}
-          <div className="bg-slate-100 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto min-h-[550px]">
-            {activeTab === "edf" && (
-              <div ref={edfPreviewRef}>
-                <EdfFormPreview data={documentData} />
-              </div>
-            )}
-            {activeTab === "invoice" && (
-              <div ref={invoicePreviewRef}>
-                <ExportInvoicePreview data={documentData} />
-              </div>
-            )}
-            {activeTab === "ad_letter" && (
-              <div ref={adLetterPreviewRef}>
-                <AdCodeLetterPreview data={documentData} />
-              </div>
-            )}
+          <div className="space-y-1">
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 text-center sm:hidden flex items-center justify-center gap-1 py-0.5">
+              <span>← Swipe sideways to inspect full A4 print layout →</span>
+            </div>
+            <div className="bg-slate-100 dark:bg-slate-950/60 p-2 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto min-h-[550px]">
+              {activeTab === "edf" && (
+                <div ref={edfPreviewRef}>
+                  <EdfFormPreview data={documentData} />
+                </div>
+              )}
+              {activeTab === "invoice" && (
+                <div ref={invoicePreviewRef}>
+                  <ExportInvoicePreview data={documentData} />
+                </div>
+              )}
+              {activeTab === "ad_letter" && (
+                <div ref={adLetterPreviewRef}>
+                  <AdCodeLetterPreview data={documentData} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

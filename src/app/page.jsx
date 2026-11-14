@@ -37,7 +37,7 @@ export default function HomePage() {
             {/* Left Column: Headline & CTA */}
             <div className="lg:col-span-7 space-y-6">
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
                 {t("heroTitleLine1")} <br />
                 <span className="bg-gradient-to-r from-teal-600 to-teal-500 dark:from-teal-400 dark:to-teal-300 bg-clip-text text-transparent">
                   {t("heroTitleLine2")}
@@ -47,12 +47,12 @@ export default function HomePage() {
               </h1>
 
               {/* Description */}
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl font-normal">
+              <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl font-normal">
                 {t("heroDesc")}
               </p>
 
               {/* 3 Feature Checkmarks with Crisp Pills */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs font-medium text-slate-700 dark:text-slate-300">
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-medium text-slate-700 dark:text-slate-300">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
                   <div className="w-4 h-4 rounded-full bg-teal-100 dark:bg-teal-950/80 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0">
                     <Check className="w-2.5 h-2.5 stroke-[3]" />
@@ -76,21 +76,21 @@ export default function HomePage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <Link
                   href="/document-generator"
-                  className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-b from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 active:scale-[0.98] text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-teal-600/25 border-t border-teal-300/40"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-b from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 active:scale-[0.98] text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-teal-600/25 border-t border-teal-300/40 text-center"
                 >
-                  <FileText className="w-4 h-4" />
+                  <FileText className="w-4 h-4 shrink-0" />
                   <span>{t("btnCreateDocs")}</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 shrink-0" />
                 </Link>
 
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition shadow-2xs active:scale-[0.98]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition shadow-2xs active:scale-[0.98] text-center"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current text-slate-500" />
+                  <Play className="w-3.5 h-3.5 fill-current text-slate-500 shrink-0" />
                   <span>{t("btnHowItWorks")}</span>
                 </a>
               </div>
