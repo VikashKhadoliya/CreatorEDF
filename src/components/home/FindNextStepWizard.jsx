@@ -86,7 +86,7 @@ export function FindNextStepWizard() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-4k-card p-6 sm:p-8 relative overflow-hidden ring-1 ring-slate-900/5 dark:ring-white/5">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-card-elevated p-6 sm:p-8 relative overflow-hidden ring-1 ring-slate-900/5 dark:ring-white/5">
       {/* Subtle ambient accent glow */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
 

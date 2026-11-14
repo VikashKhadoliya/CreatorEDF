@@ -130,8 +130,8 @@ export function EdfEducationGuide() {
                 <span>Bank & AD Code Identifiers</span>
               </div>
               <ul className="list-disc list-inside text-xs text-slate-600 dark:text-slate-400 space-y-0.5 pl-1">
-                <li>14-digit Authorised Dealer (AD) Code of your bank branch</li>
-                <li>Bank Name, Branch Name & IFSC Code</li>
+                <li>Authorised Dealer (AD) Code of your bank branch (7 to 14 characters as provided by your bank)</li>
+                <li>Bank Name, Branch Name &amp; IFSC Code</li>
                 <li>Account Number receiving the foreign wire transfer</li>
               </ul>
             </div>
@@ -329,7 +329,7 @@ export function EdfEducationGuide() {
       {/* =========================================================================
           SECTION HEADER: Bilingual "EDF Kya Hai Aur Ise Kahan Submit Karein?"
           ========================================================================= */}
-      <div className="bg-gradient-to-b from-white via-teal-50/30 to-white dark:from-slate-900 dark:via-teal-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-4k-card ring-1 ring-slate-900/5 dark:ring-white/5 space-y-8">
+      <div className="bg-gradient-to-b from-white via-teal-50/30 to-white dark:from-slate-900 dark:via-teal-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-card-elevated ring-1 ring-slate-900/5 dark:ring-white/5 space-y-8">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             EDF Kya Hai Aur Ise Kahan Submit Karein?
@@ -400,7 +400,7 @@ export function EdfEducationGuide() {
               What to Prepare First?
             </h4>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Before contacting your bank, prepare your legal PAN/name, foreign client name & address, payment remittance advice (UTR/SWIFT reference), invoice breakdown, and 14-digit bank AD code.
+              Before contacting your bank, prepare your legal PAN/name, foreign client name &amp; address, payment remittance advice (UTR/SWIFT reference), invoice breakdown, and bank AD Code (traditionally 7 digits, or extended bank format).
             </p>
             <div className="text-[11px] text-teal-700 dark:text-teal-400 font-medium pt-1 border-t border-slate-100 dark:border-slate-700/60">
               Hindi: PAN, payment reference, overseas address aur invoice ready rakhein.

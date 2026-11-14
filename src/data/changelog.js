@@ -22,10 +22,10 @@ export const changelogEntries = [
   {
     version: "v2.4.0",
     date: "November 13, 2026",
-    title: "4K Ultra-HD Finish & In-Browser Cookie Privacy Toast",
+    title: "Visual Polish & Discrete Privacy Notice",
     category: "Design & UX",
     tagColor: "navy",
-    description: "Upgraded to a 4K Ultra-HD finish with crisp typography, ambient glow lighting, micro-grid backdrop, and refined depth shadows. Converted top alert into a sleek floating in-browser privacy cookie toast.",
+    description: "Refined visual finish with crisp typography, ambient glow lighting, micro-grid backdrop, and subtle depth shadows. Converted top alert into a discrete floating in-browser privacy notice.",
     highlights: [
       "Subpixel text antialiasing with refined letter tracking (-0.025em)",
       "Ambient teal mesh glow and 24px micro-grid background textures",
@@ -65,11 +65,11 @@ export const changelogEntries = [
     title: "Zero Demo Data & Client-Side Privacy Sandbox",
     category: "Privacy & Security",
     tagColor: "teal",
-    description: "Purged all mock revenue, sample bank details, and fake client records. Forms start 100% clean and blank. Exporter profiles are stored exclusively inside the user's browser via IndexedDB.",
+    description: "Purged sample bank details and mock records. Forms start clean and blank. Exporter profiles are stored exclusively inside the user's browser via IndexedDB.",
     highlights: [
       "No default pre-filled sample bank accounts or PAN cards",
-      "100% client-side memory execution — no server-side database",
-      "Zero telemetry or tracking of sensitive financial earnings"
+      "Client-side execution in your browser — no server-side database",
+      "Zero tracking of sensitive personal or financial earnings"
     ]
   },
   {

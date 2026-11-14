@@ -162,16 +162,24 @@ export function EdfFormPreview({ data }) {
             <tbody>
               <tr className="divide-x divide-slate-400">
                 <td className="p-1 text-center font-bold">1</td>
-                <td className="p-1 font-medium">{data.recipientName}<br />{data.recipientAddress}</td>
-                <td className="p-1">{data.recipientCountry}</td>
-                <td className="p-1 font-mono font-medium">{data.invoiceNumber}</td>
-                <td className="p-1 font-mono">{formattedInvDate}</td>
-                <td className="p-1 font-mono">{data.currency || "USD"}</td>
-                <td className="p-1 font-mono font-bold">{parseFloat(data.invoiceAmount || 0).toFixed(2)}</td>
-                <td className="p-1 font-mono">{parseFloat(data.netRealisableValue || data.invoiceAmount || 0).toFixed(2)}</td>
+                <td className="p-1 font-medium">{data.recipientName || "—"}<br />{data.recipientAddress || "—"}</td>
+                <td className="p-1">{data.recipientCountry || "—"}</td>
+                <td className="p-1 font-mono font-medium">{data.invoiceNumber || "—"}</td>
+                <td className="p-1 font-mono">{formattedInvDate || "—"}</td>
+                <td className="p-1 font-mono">{data.currency || "—"}</td>
+                <td className="p-1 font-mono font-bold">
+                  {data.invoiceAmount && parseFloat(data.invoiceAmount) > 0 ? parseFloat(data.invoiceAmount).toFixed(2) : "—"}
+                </td>
+                <td className="p-1 font-mono">
+                  {data.netRealisableValue && parseFloat(data.netRealisableValue) > 0
+                    ? parseFloat(data.netRealisableValue).toFixed(2)
+                    : (data.invoiceAmount && parseFloat(data.invoiceAmount) > 0
+                        ? parseFloat(data.invoiceAmount).toFixed(2)
+                        : "—")}
+                </td>
                 <td className="p-1 text-slate-500">Not applicable</td>
-                <td className="p-1">{data.serviceDescription}</td>
-                <td className="p-1 font-mono">{data.sacCode || "998361"}</td>
+                <td className="p-1">{data.serviceDescription || "—"}</td>
+                <td className="p-1 font-mono">{data.sacCode || "—"}</td>
                 <td className="p-1 text-slate-500">Not applicable</td>
               </tr>
             </tbody>

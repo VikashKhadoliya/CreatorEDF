@@ -29,7 +29,7 @@ export default function HomePage() {
   return (
     <div className="space-y-12 pb-16">
       {/* =========================================================================
-          1. HERO SECTION: Clean American SaaS Workspace Layout (4K Ultra-HD)
+          1. HERO SECTION: Clean Workspace Layout
           ========================================================================= */}
       <section className="relative overflow-hidden pt-6 pb-12 sm:py-16 bg-ambient-glow bg-dot-matrix border-b border-slate-200/60 dark:border-slate-800/60 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -96,13 +96,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Original 3D Workspace Illustration in 4K Framing */}
+            {/* Right Column: Original Workspace Illustration */}
             <div className="lg:col-span-5 relative flex flex-col items-center justify-center py-2">
               {/* Soft ambient teal backdrop glow */}
               <div className="absolute -inset-2 bg-gradient-to-tr from-teal-500/15 via-teal-400/5 to-slate-200/20 dark:from-teal-500/20 dark:via-teal-400/5 dark:to-transparent rounded-3xl blur-2xl pointer-events-none"></div>
 
               {/* Main Workspace Visual Card */}
-              <div className="relative w-full max-w-lg rounded-2xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-4k-card bg-white dark:bg-slate-900 group ring-1 ring-slate-900/5 dark:ring-white/10">
+              <div className="relative w-full max-w-lg rounded-2xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card-elevated bg-white dark:bg-slate-900 group ring-1 ring-slate-900/5 dark:ring-white/10">
                 <img
                   src="/assets/hero-workspace.png"
                   alt="CreatorEDF Export Document Generation Workspace"
@@ -160,7 +160,7 @@ export default function HomePage() {
       <AdSlot slotId="hero-bottom-responsive" format="horizontal" />
 
       {/* =========================================================================
-          2. MAIN TOOLS SECTION: 3 PROMINENT CARDS WITH ORIGINAL 3D ART (4K Studio)
+          2. MAIN TOOLS SECTION: 3 PROMINENT CARDS
           ========================================================================= */}
       <section id="tools" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="text-center space-y-2 max-w-2xl mx-auto mb-10">
@@ -175,7 +175,7 @@ export default function HomePage() {
         {/* 3 Tool Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* Card 1: RBI EDF Form Generator */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-4k-card hover:shadow-4k-glow hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-card-elevated hover:shadow-card-hover hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
             <div className="space-y-4">
               {/* Tool Card Art Header with subtle inset gradient */}
               <div className="w-full h-48 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/60 dark:from-slate-800/80 dark:to-slate-900/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-3 relative shadow-inner">
@@ -208,7 +208,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2: Export Invoice Generator */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-4k-card hover:shadow-4k-glow hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-card-elevated hover:shadow-card-hover hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
             <div className="space-y-4">
               {/* Tool Card Art Header */}
               <div className="w-full h-48 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/60 dark:from-slate-800/80 dark:to-slate-900/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-3 relative shadow-inner">
@@ -241,7 +241,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3: Bank AD Code Request Letter */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-4k-card hover:shadow-4k-glow hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-card-elevated hover:shadow-card-hover hover:border-teal-400/80 dark:hover:border-teal-500/80 transition-all duration-300 flex flex-col justify-between group ring-1 ring-slate-900/5 dark:ring-white/5">
             <div className="space-y-4">
               {/* Tool Card Art Header */}
               <div className="w-full h-48 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/60 dark:from-slate-800/80 dark:to-slate-900/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-3 relative shadow-inner">
@@ -281,12 +281,12 @@ export default function HomePage() {
       <AdSlot slotId="mid-tools-guides" format="horizontal" />
 
       {/* =========================================================================
-          3. HOW IT WORKS & QUICK GUIDES (4K Studio)
+          3. HOW IT WORKS & QUICK GUIDES
           ========================================================================= */}
       <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left Side: 3-Step Process (7 cols) */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-4k-card flex flex-col justify-between ring-1 ring-slate-900/5 dark:ring-white/5">
+          <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-card-elevated flex flex-col justify-between ring-1 ring-slate-900/5 dark:ring-white/5">
             <div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {t("howTitle")}
@@ -371,8 +371,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Side: Quick Guides Card with 3D Manuals Art (5 cols) */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-teal-50/80 via-white to-slate-50 dark:from-teal-950/40 dark:via-slate-900 dark:to-slate-900 border border-teal-200/80 dark:border-teal-900/60 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-4k-card ring-1 ring-teal-500/10">
+          {/* Right Side: Quick Guides Card (5 cols) */}
+          <div className="lg:col-span-5 bg-gradient-to-br from-teal-50/80 via-white to-slate-50 dark:from-teal-950/40 dark:via-slate-900 dark:to-slate-900 border border-teal-200/80 dark:border-teal-900/60 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-card-elevated ring-1 ring-teal-500/10">
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/20">
@@ -413,20 +413,20 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          4. CLIENT-SIDE PRIVACY & SECURITY FEATURE SECTION (4K Studio Finish)
+          4. IN-BROWSER PRIVACY & SECURITY FEATURE SECTION
           ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 border border-slate-800/90 shadow-4k-card overflow-hidden relative ring-1 ring-white/10">
+        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 border border-slate-800/90 shadow-card-elevated overflow-hidden relative ring-1 ring-white/10">
           {/* Subtle background ambient teal glow */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            {/* Left 3D Privacy Illustration */}
+            {/* Left Privacy Illustration */}
             <div className="lg:col-span-5 flex items-center justify-center">
               <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-slate-800/90 shadow-2xl bg-slate-900/80 p-3 ring-1 ring-slate-700/50">
                 <img
                   src="/assets/privacy-security.png"
-                  alt="100% Client-Side In-Browser Processing"
+                  alt="In-Browser Local Processing"
                   className="w-full h-auto object-contain filter drop-shadow-md"
                 />
               </div>

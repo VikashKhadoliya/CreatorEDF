@@ -107,7 +107,7 @@ export default function GuidesPage() {
           </div>
 
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            <strong>Realisation Period:</strong> The statutory realization period under FEMA regulations is 9 months from the date of export for foreign currency, or 12 months for settlements via Special Rupee Vostro Accounts (SRVA).
+            <strong>Realisation Period:</strong> The statutory realization period under Regulation 5(1) of FEMA 23(R)/2026-RB is 9 months from the date of invoice, or 12 months where exports are invoiced and/or settled in Indian Rupees.
           </p>
         </div>
       </div>
@@ -134,10 +134,10 @@ export default function GuidesPage() {
           </p>
           <ul className="list-disc pl-5 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
             <li>
-              <strong>Unregistered Creators:</strong> If your total turnover is below ₹20 Lakhs, you can issue a Commercial Export Invoice without a GSTIN or LUT endorsement.
+              <strong>Unregistered Creators:</strong> If your total turnover is below the GST registration threshold (typically ₹20 Lakhs in standard states and ₹10 Lakhs in special category states), you can issue a Commercial Export Invoice with GSTIN marked as "Not Registered (URP)" without an LUT endorsement.
             </li>
             <li>
-              <strong>GST Registered with LUT:</strong> Under CGST Rule 96A, your invoice must bear the endorsement: <em>"SUPPLY MEANT FOR EXPORT UNDER BOND OR LETTER OF UNDERTAKING WITHOUT PAYMENT OF INTEGRATED TAX"</em> along with your LUT ARN.
+              <strong>GST Registered with LUT:</strong> Under CGST Rule 96A, registered exporters must file a Letter of Undertaking (LUT) on the GST portal to export zero-rated without paying IGST, and the invoice must bear the statutory endorsement: <em>"SUPPLY MEANT FOR EXPORT UNDER BOND OR LETTER OF UNDERTAKING WITHOUT PAYMENT OF INTEGRATED TAX"</em> along with your LUT ARN and financial year.
             </li>
           </ul>
         </div>
@@ -181,7 +181,7 @@ export default function GuidesPage() {
           Ready to prepare your documents?
         </h3>
         <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-          Enter your details, preview the live PDF, and download in seconds. 100% free.
+          Enter your details, preview the live PDF, and download in seconds. Free for all creators.
         </p>
         <Link
           href="/document-generator"

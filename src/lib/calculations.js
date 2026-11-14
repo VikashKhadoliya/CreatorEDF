@@ -73,7 +73,7 @@ export function amountToWesternWords(amount, currency = "USD") {
   }
 
   const num = Math.round((Number(amount) + Number.EPSILON) * 100) / 100;
-  if (num < 0) return "Negative amounts not supported";
+  if (num <= 0) return "";
 
   const intPart = Math.floor(num);
   const decimalPart = Math.round((num - intPart) * 100);
@@ -115,7 +115,7 @@ export function amountToIndianWords(inrAmount) {
   }
 
   const num = Math.round((Number(inrAmount) + Number.EPSILON) * 100) / 100;
-  if (num < 0) return "Negative amounts not supported";
+  if (num <= 0) return "";
 
   const intPart = Math.floor(num);
   const paise = Math.round((num - intPart) * 100);
@@ -239,9 +239,9 @@ export function validateDocumentInputs(data) {
   if (!data.bankName?.trim()) errors.push("Authorised Dealer / Bank Name is required");
   if (!data.bankBranch?.trim()) errors.push("AD Branch Address is required");
   if (!data.adCode?.trim()) {
-    errors.push("7-digit RBI AD Code is required");
-  } else if (!/^\d{7}$/.test(data.adCode.trim())) {
-    errors.push("RBI AD Code must be exactly 7 numeric digits");
+    errors.push("Bank Authorised Dealer (AD) Code is required");
+  } else if (!/^[0-9A-Za-z]{7,14}$/.test(data.adCode.trim())) {
+    errors.push("AD Code must be 7 to 14 alphanumeric characters as issued by your bank");
   }
 
   // Service Description & SAC

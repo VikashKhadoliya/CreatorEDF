@@ -76,8 +76,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/exporter-profile" className="hover:text-teal-600 dark:hover:text-teal-400 transition">
-                  My Exporter Profile
+                <Link href="/about" className="hover:text-teal-600 dark:hover:text-teal-400 transition">
+                  About CreatorEDF
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-teal-600 dark:hover:text-teal-400 transition">
+                  Contact &amp; Feedback
                 </Link>
               </li>
               <li>
@@ -171,15 +176,15 @@ export function Footer() {
             © {new Date().getFullYear()} CreatorEDF. {t("footerRights")}
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/guides#privacy" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
+            <Link href="/privacy" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
               {t("footerPrivacy")}
             </Link>
             <span>•</span>
-            <Link href="/guides#terms" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
+            <Link href="/terms" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
               {t("footerTerms")}
             </Link>
             <span>•</span>
-            <Link href="/guides#disclaimer" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
+            <Link href="/disclaimer" className="hover:text-slate-600 dark:hover:text-slate-300 transition">
               {t("footerDisclaimer")}
             </Link>
           </div>

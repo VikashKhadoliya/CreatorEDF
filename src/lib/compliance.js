@@ -10,9 +10,41 @@ export const STATUTORY_CITATIONS = {
   femaNotification: "Notification No. FEMA 23(R)/2026-RB",
   amendmentNotification: "Notification No. FEMA 23(R)/(2)/2026-RB (Nov 2, 2026)",
   officialUrl: "https://www.rbi.org.in/scriptS/NotificationUser.aspx?Id=13277&Mode=0",
-  normalRealisationMonths: 9, // Regulation 5(1)
-  inrSettlementMonths: 12,    // SRVA mechanism (RBI Circular No. 10 / 2022)
+  normalRealisationMonths: 9, // Regulation 5(1): Normal realisation period from date of invoice
+  inrSettlementMonths: 12,    // Regulation 5(1): Applicable when exports are invoiced and/or settled in Indian Rupees
   nonIndividualThresholdInr: 1000000, // ₹10 Lakhs [Regulation 3(2)(b)]
+};
+
+/**
+ * Regulation 3(2)(c) Provision Note:
+ * Consolidated Monthly EDF Submission:
+ * Under Regulation 3(2)(c), a service exporter may submit a consolidated declaration
+ * for multiple invoices/recipients within a calendar month.
+ */
+export const REGULATION_3_2_C_PROVISION = {
+  code: "FEMA_23R_REG_3_2_C",
+  title: "Consolidated Monthly EDF Permitted",
+  description: "Under Regulation 3(2)(c), a service exporter may submit one consolidated declaration form covering multiple clients or invoices within a calendar month.",
+};
+
+/**
+ * Regulation 2(1)(f) Specified Authorities:
+ * Distinguishes authority for services other than software vs software exports.
+ */
+export const SPECIFIED_AUTHORITIES = {
+  nonSoftwareDta: "Authorised Dealer (AD) Bank branch handling the inward remittance",
+  softwareDta: "Authorised Dealer (AD) Bank or Software Technology Parks of India (STPI) under SOFTEX scheme",
+  sezUnits: "Designated Development Commissioner of the applicable Special Economic Zone",
+};
+
+/**
+ * Service Classification Guidance Note:
+ * RBI definition of software is broad and includes computer software, recorded media,
+ * and audio-visual digital transmissions. Creators must determine classification based
+ * on the actual nature of their contract and bank's instructions.
+ */
+export const CLASSIFICATION_GUIDANCE = {
+  note: "Do not automatically classify every creator earning as non-software. The regulatory definition of software can include custom code, web applications, and digital media files. Verify whether your bank requires standard AD disposal or an STPI SOFTEX filing.",
 };
 
 /**
@@ -198,7 +230,7 @@ export function evaluateGstInvoiceEndorsement({
       showEndorsement: false,
       invoiceType: "Commercial Export Invoice",
       endorsementText: null,
-      notes: "Unregistered exporter. Issued under threshold exemption without GSTIN or LUT endorsement.",
+      notes: "Unregistered exporter. Issued under turnover exemption (₹20 Lakhs in standard states, ₹10 Lakhs in special category states). Does not carry GSTIN or LUT endorsement. Consult a chartered accountant for individual tax applicability.",
     };
   }
 
