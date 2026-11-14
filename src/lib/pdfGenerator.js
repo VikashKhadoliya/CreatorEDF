@@ -629,12 +629,12 @@ export async function generateCombinedComplianceZip(data) {
   const invBlob = invDoc.output("blob");
   const adBlob = adDoc.output("blob");
 
-  const sanitizedInv = (data.invoiceNumber || "Invoice").replace(/[/\\:*?"<>|]/g, "_");
-  const sanitizedBank = (data.bankName || "Bank").replace(/[/\\:*?"<>|]/g, "_");
+  const sanitizedInv = (data.invoiceNumber || "Form").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
+  const sanitizedBank = (data.bankName || "Bank").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
 
-  zip.file(`1_RBI_Form_EDF_${sanitizedInv}.pdf`, edfBlob);
-  zip.file(`2_Export_Invoice_${sanitizedInv}.pdf`, invBlob);
-  zip.file(`3_Bank_AD_Code_Letter_${sanitizedBank}.pdf`, adBlob);
+  zip.file(`CreatorEDF_EDF_Form_${sanitizedInv}.pdf`, edfBlob);
+  zip.file(`CreatorEDF_Export_Invoice_${sanitizedInv}.pdf`, invBlob);
+  zip.file(`CreatorEDF_AD_Code_Letter_${sanitizedBank}.pdf`, adBlob);
 
   const metadata = {
     application: "CreatorEDF",

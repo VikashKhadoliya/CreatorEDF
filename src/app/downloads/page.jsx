@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getDownloads } from "@/lib/db";
-import { Download, FileText, Archive, Clock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Download, FileText, Archive, Clock, ArrowRight, ShieldCheck, Image as ImageIcon } from "lucide-react";
 import { RegulatoryNotice } from "@/components/layout/RegulatoryNotice";
 import Link from "next/link";
 
@@ -75,26 +75,46 @@ export default function DownloadsPage() {
               </div>
             </div>
           ) : (
-            downloads.map((d) => (
-              <div key={d.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center font-bold text-xs">
-                    {d.documentType === "bundle" ? <Archive className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+            downloads.map((d) => {
+              const isPng = d.format === "png" || d.fileName?.endsWith(".png");
+              const isZip = d.documentType === "bundle" || d.fileName?.endsWith(".zip");
+              return (
+                <div key={d.id} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold text-xs shrink-0">
+                      {isZip ? (
+                        <Archive className="w-4 h-4" />
+                      ) : isPng ? (
+                        <ImageIcon className="w-4 h-4" />
+                      ) : (
+                        <FileText className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 dark:text-white text-xs">{d.fileName}</h4>
+                      <span className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <Clock className="w-3 h-3" />
+                        <span>Generated {new Date(d.timestamp).toLocaleDateString()}</span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <span className="uppercase text-[10px] font-semibold tracking-wider text-slate-500">
+                          {isZip ? "ZIP Archive" : isPng ? "PNG 2x Image" : "PDF Document"}
+                        </span>
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-navy-800 text-xs">{d.fileName}</h4>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                      <Clock className="w-3 h-3" />
-                      Generated {new Date(d.timestamp).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
 
-                <span className="px-3 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 uppercase">
-                  {d.documentType}
-                </span>
-              </div>
-            ))
+                  <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                    isZip
+                      ? "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                      : isPng
+                      ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                      : "bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800"
+                  }`}>
+                    {isZip ? "ZIP" : isPng ? "PNG" : "PDF"}
+                  </span>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

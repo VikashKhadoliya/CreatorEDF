@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
   getExporterProfile,
@@ -27,6 +27,7 @@ import {
   generateAdCodeLetterPdf,
   generateCombinedComplianceZip,
 } from "@/lib/pdfGenerator";
+import { exportElementToPng } from "@/lib/imageExporter";
 import { EdfFormPreview } from "@/components/documents/EdfFormPreview";
 import { ExportInvoicePreview } from "@/components/documents/ExportInvoicePreview";
 import { AdCodeLetterPreview } from "@/components/documents/AdCodeLetterPreview";
@@ -49,6 +50,8 @@ import {
   ChevronDown,
   Sparkles,
   Info,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 
 export default function DocumentGeneratorPage() {
@@ -97,6 +100,16 @@ export default function DocumentGeneratorPage() {
   const [downloadSuccessMessage, setDownloadSuccessMessage] = useState("");
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
   const [hasSavedProfile, setHasSavedProfile] = useState(false);
+  const [isExporting, setIsExporting] = useState(null); // 'edf_png' | 'invoice_png' | 'ad_letter_png' | 'zip' | null
+
+  // Element Refs for high-res PNG export
+  const edfPreviewRef = useRef(null);
+  const invoicePreviewRef = useRef(null);
+  const adLetterPreviewRef = useRef(null);
+
+  const edfHiddenRef = useRef(null);
+  const invoiceHiddenRef = useRef(null);
+  const adLetterHiddenRef = useRef(null);
 
   // Load initial data from local browser IndexedDB
   useEffect(() => {
@@ -291,66 +304,138 @@ export default function DocumentGeneratorPage() {
     setTimeout(() => setProfileSaveSuccess(false), 3500);
   };
 
-  // Download Handlers
-  const handleDownloadEdf = async () => {
+  // Sanitized filename slugs
+  const sanitizedInvoice = (invoiceNumber || "Form").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
+  const sanitizedBank = (bankName || "Bank").trim().replace(/[\s/\\:*?"<>|]+/g, "_");
+
+  // Format-aware EDF Download (PDF & High-Res PNG)
+  const handleDownloadEdf = async (format = "pdf") => {
     if (!isFormValid) {
       setValidationErrors(validationResult.errors);
       return;
     }
     setValidationErrors([]);
+
+    if (format === "png") {
+      try {
+        setIsExporting("edf_png");
+        const el = activeTab === "edf" ? edfPreviewRef.current : edfHiddenRef.current;
+        const fileName = `CreatorEDF_EDF_Form_${sanitizedInvoice}.png`;
+        await exportElementToPng(el, fileName);
+        await saveDownload({ documentType: "edf", format: "png", fileName, invoiceId: invoiceNumber });
+        notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
+      } catch (err) {
+        console.error("EDF PNG export failed:", err);
+        alert("Failed to export PNG image. Please download PDF instead.");
+      } finally {
+        setIsExporting(null);
+      }
+      return;
+    }
+
+    // PDF format
     const doc = generateEdfFormPdf(documentData);
-    const fileName = `1_RBI_Form_EDF_${invoiceNumber.replace(/[/\\:*?"<>|]/g, "_")}.pdf`;
+    const fileName = `CreatorEDF_EDF_Form_${sanitizedInvoice}.pdf`;
     doc.save(fileName);
-    await saveDownload({ documentType: "edf", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded ${fileName}`);
+    await saveDownload({ documentType: "edf", format: "pdf", fileName, invoiceId: invoiceNumber });
+    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
   };
 
-  const handleDownloadInvoice = async () => {
+  // Format-aware Invoice Download (PDF & High-Res PNG)
+  const handleDownloadInvoice = async (format = "pdf") => {
     if (!isFormValid) {
       setValidationErrors(validationResult.errors);
       return;
     }
     setValidationErrors([]);
+
+    if (format === "png") {
+      try {
+        setIsExporting("invoice_png");
+        const el = activeTab === "invoice" ? invoicePreviewRef.current : invoiceHiddenRef.current;
+        const fileName = `CreatorEDF_Export_Invoice_${sanitizedInvoice}.png`;
+        await exportElementToPng(el, fileName);
+        await saveDownload({ documentType: "invoice", format: "png", fileName, invoiceId: invoiceNumber });
+        notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
+      } catch (err) {
+        console.error("Invoice PNG export failed:", err);
+        alert("Failed to export PNG image. Please download PDF instead.");
+      } finally {
+        setIsExporting(null);
+      }
+      return;
+    }
+
+    // PDF format
     const doc = generateExportInvoicePdf(documentData);
-    const fileName = `2_Export_Invoice_${invoiceNumber.replace(/[/\\:*?"<>|]/g, "_")}.pdf`;
+    const fileName = `CreatorEDF_Export_Invoice_${sanitizedInvoice}.pdf`;
     doc.save(fileName);
-    await saveDownload({ documentType: "invoice", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded ${fileName}`);
+    await saveDownload({ documentType: "invoice", format: "pdf", fileName, invoiceId: invoiceNumber });
+    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
   };
 
-  const handleDownloadAdLetter = async () => {
+  // Format-aware AD Code Letter Download (PDF & High-Res PNG)
+  const handleDownloadAdLetter = async (format = "pdf") => {
     if (!isFormValid) {
       setValidationErrors(validationResult.errors);
       return;
     }
     setValidationErrors([]);
+
+    if (format === "png") {
+      try {
+        setIsExporting("ad_letter_png");
+        const el = activeTab === "ad_letter" ? adLetterPreviewRef.current : adLetterHiddenRef.current;
+        const fileName = `CreatorEDF_AD_Code_Letter_${sanitizedBank}.png`;
+        await exportElementToPng(el, fileName);
+        await saveDownload({ documentType: "ad_letter", format: "png", fileName, invoiceId: invoiceNumber });
+        notifySuccess(`Downloaded high-resolution PNG: ${fileName}`);
+      } catch (err) {
+        console.error("AD Letter PNG export failed:", err);
+        alert("Failed to export PNG image. Please download PDF instead.");
+      } finally {
+        setIsExporting(null);
+      }
+      return;
+    }
+
+    // PDF format
     const doc = generateAdCodeLetterPdf(documentData);
-    const fileName = `3_Bank_AD_Code_Letter_${(documentData.bankName || "Bank").replace(/[/\\:*?"<>|]/g, "_")}.pdf`;
+    const fileName = `CreatorEDF_AD_Code_Letter_${sanitizedBank}.pdf`;
     doc.save(fileName);
-    await saveDownload({ documentType: "ad_letter", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded ${fileName}`);
+    await saveDownload({ documentType: "ad_letter", format: "pdf", fileName, invoiceId: invoiceNumber });
+    notifySuccess(`Downloaded bank-ready PDF: ${fileName}`);
   };
 
+  // Combined ZIP Package Download (All 3 PDFs)
   const handleDownloadZipBundle = async () => {
     if (!isFormValid) {
       setValidationErrors(validationResult.errors);
       return;
     }
     setValidationErrors([]);
-    const zipBlob = await generateCombinedComplianceZip(documentData);
-    const fileName = `CreatorEDF_Compliance_Packet_${invoiceNumber.replace(/[/\\:*?"<>|]/g, "_")}.zip`;
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 1000);
-    await saveDownload({ documentType: "bundle", fileName, invoiceId: invoiceNumber });
-    notifySuccess(`Downloaded ${fileName}`);
+    try {
+      setIsExporting("zip");
+      const zipBlob = await generateCombinedComplianceZip(documentData);
+      const fileName = `CreatorEDF_All_Documents_${sanitizedInvoice}.zip`;
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      await saveDownload({ documentType: "bundle", format: "zip", fileName, invoiceId: invoiceNumber });
+      notifySuccess(`Downloaded compliance package: ${fileName}`);
+    } catch (err) {
+      console.error("ZIP creation failed:", err);
+      alert("Failed to create ZIP package. Please download individual PDFs.");
+    } finally {
+      setIsExporting(null);
+    }
   };
 
   const notifySuccess = (msg) => {
@@ -384,19 +469,23 @@ export default function DocumentGeneratorPage() {
         <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
           <button
             onClick={handleDownloadZipBundle}
-            disabled={!isFormValid}
+            disabled={!isFormValid || Boolean(isExporting)}
             className={`w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition shadow-md shrink-0 ${
-              isFormValid
+              isFormValid && !isExporting
                 ? "bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white shadow-teal-600/20 cursor-pointer"
                 : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
             }`}
           >
-            <Archive className="w-4 h-4" />
-            <span>Download All 3 Documents (ZIP)</span>
+            {isExporting === "zip" ? (
+              <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
+            ) : (
+              <Archive className="w-4 h-4" />
+            )}
+            <span>{isExporting === "zip" ? "Compressing Package..." : "Download All 3 Documents (ZIP)"}</span>
           </button>
           {!isFormValid && (
             <span className="text-[10px] text-slate-400 dark:text-slate-500 text-center md:text-right">
-              Fill required fields to enable download
+              Complete required details to enable downloads
             </span>
           )}
         </div>
@@ -929,61 +1018,319 @@ export default function DocumentGeneratorPage() {
               </button>
             </div>
 
-            {/* Individual Download Button */}
-            <div>
-              {activeTab === "edf" && (
-                <button
-                  onClick={handleDownloadEdf}
-                  disabled={!isFormValid}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs transition shadow-xs ${
-                    isFormValid
-                      ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  }`}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download EDF (PDF)</span>
-                </button>
-              )}
+            {/* Action Bar for Active Document: Dual PDF & PNG Buttons */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeTab === "edf") handleDownloadEdf("pdf");
+                  if (activeTab === "invoice") handleDownloadInvoice("pdf");
+                  if (activeTab === "ad_letter") handleDownloadAdLetter("pdf");
+                }}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs transition shadow-xs ${
+                  isFormValid && !isExporting
+                    ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                }`}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>
+                  Download {activeTab === "edf" ? "EDF" : activeTab === "invoice" ? "Invoice" : "Letter"} (PDF)
+                </span>
+              </button>
 
-              {activeTab === "invoice" && (
-                <button
-                  onClick={handleDownloadInvoice}
-                  disabled={!isFormValid}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs transition shadow-xs ${
-                    isFormValid
-                      ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  }`}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Invoice (PDF)</span>
-                </button>
-              )}
-
-              {activeTab === "ad_letter" && (
-                <button
-                  onClick={handleDownloadAdLetter}
-                  disabled={!isFormValid}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs transition shadow-xs ${
-                    isFormValid
-                      ? "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  }`}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Letter (PDF)</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeTab === "edf") handleDownloadEdf("png");
+                  if (activeTab === "invoice") handleDownloadInvoice("png");
+                  if (activeTab === "ad_letter") handleDownloadAdLetter("png");
+                }}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs transition border ${
+                  isFormValid && !isExporting
+                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer shadow-2xs"
+                    : "bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                }`}
+              >
+                {isExporting?.endsWith("_png") ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                ) : (
+                  <ImageIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                )}
+                <span>
+                  {isExporting?.endsWith("_png") ? "Exporting..." : "Download PNG"}
+                </span>
+              </button>
             </div>
           </div>
 
-          {/* Document Preview Frame */}
+          {/* Document Preview Frame (with Ref for Active Document) */}
           <div className="bg-slate-100 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto min-h-[550px]">
-            {activeTab === "edf" && <EdfFormPreview data={documentData} />}
-            {activeTab === "invoice" && <ExportInvoicePreview data={documentData} />}
-            {activeTab === "ad_letter" && <AdCodeLetterPreview data={documentData} />}
+            {activeTab === "edf" && (
+              <div ref={edfPreviewRef}>
+                <EdfFormPreview data={documentData} />
+              </div>
+            )}
+            {activeTab === "invoice" && (
+              <div ref={invoicePreviewRef}>
+                <ExportInvoicePreview data={documentData} />
+              </div>
+            )}
+            {activeTab === "ad_letter" && (
+              <div ref={adLetterPreviewRef}>
+                <AdCodeLetterPreview data={documentData} />
+              </div>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Off-screen Previews for Instant High-Res PNG Capture of Non-Active Tabs */}
+      <div
+        style={{
+          position: "absolute",
+          left: "-99999px",
+          top: 0,
+          width: "210mm",
+          pointerEvents: "none",
+          opacity: 0,
+        }}
+        aria-hidden="true"
+      >
+        <div ref={edfHiddenRef}>
+          <EdfFormPreview data={documentData} />
+        </div>
+        <div ref={invoiceHiddenRef}>
+          <ExportInvoicePreview data={documentData} />
+        </div>
+        <div ref={adLetterHiddenRef}>
+          <AdCodeLetterPreview data={documentData} />
+        </div>
+      </div>
+
+      {/* Dedicated Document Download Center: Individual Document Cards & ZIP Package */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Download className="w-5 h-5 text-teal-600" />
+              <span>Document Download Center</span>
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Choose your preferred format for individual compliance documents, or download the full submission package.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-semibold border border-teal-200 dark:border-teal-800/60">
+              <FileText className="w-3.5 h-3.5" />
+              <span>PDF (Bank-Ready A4)</span>
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700">
+              <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+              <span>PNG (Crisp 2x Image)</span>
+            </span>
+          </div>
+        </div>
+
+        {/* 3 Individual Document Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Form EDF */}
+          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 bg-slate-50/50 dark:bg-slate-950/40 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">
+                  Document 1
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">Section 2B</span>
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                RBI Form EDF Annexure
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Prescribed declaration for service exports under FEMA 23(R)/2026-RB regulations.
+              </p>
+              <div className="text-[10px] font-mono text-slate-400 truncate pt-1">
+                CreatorEDF_EDF_Form_{sanitizedInvoice}.pdf
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleDownloadEdf("pdf")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition ${
+                  isFormValid && !isExporting
+                    ? "bg-teal-600 hover:bg-teal-700 text-white shadow-xs cursor-pointer"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDownloadEdf("png")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition ${
+                  isFormValid && !isExporting
+                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer shadow-2xs"
+                    : "bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                }`}
+              >
+                {isExporting === "edf_png" ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                ) : (
+                  <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+                )}
+                <span>PNG</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card 2: Export Invoice */}
+          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 bg-slate-50/50 dark:bg-slate-950/40 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">
+                  Document 2
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">GST Zero-Rated</span>
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                Commercial Export Invoice
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Full commercial invoice with SAC classification, currency valuation and LUT statement.
+              </p>
+              <div className="text-[10px] font-mono text-slate-400 truncate pt-1">
+                CreatorEDF_Export_Invoice_{sanitizedInvoice}.pdf
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleDownloadInvoice("pdf")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition ${
+                  isFormValid && !isExporting
+                    ? "bg-teal-600 hover:bg-teal-700 text-white shadow-xs cursor-pointer"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDownloadInvoice("png")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition ${
+                  isFormValid && !isExporting
+                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer shadow-2xs"
+                    : "bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                }`}
+              >
+                {isExporting === "invoice_png" ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                ) : (
+                  <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+                )}
+                <span>PNG</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card 3: Bank AD Code Letter */}
+          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 bg-slate-50/50 dark:bg-slate-950/40 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">
+                  Document 3
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">Forex Desk</span>
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                Bank AD Code Request Letter
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Formal request letter to your Authorised Dealer branch forex department for AD code provision.
+              </p>
+              <div className="text-[10px] font-mono text-slate-400 truncate pt-1">
+                CreatorEDF_AD_Code_Letter_{sanitizedBank}.pdf
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleDownloadAdLetter("pdf")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition ${
+                  isFormValid && !isExporting
+                    ? "bg-teal-600 hover:bg-teal-700 text-white shadow-xs cursor-pointer"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDownloadAdLetter("png")}
+                disabled={!isFormValid || Boolean(isExporting)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition ${
+                  isFormValid && !isExporting
+                    ? "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer shadow-2xs"
+                    : "bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                }`}
+              >
+                {isExporting === "ad_letter_png" ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                ) : (
+                  <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+                )}
+                <span>PNG</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Full ZIP Package Banner Card */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-200/70 dark:border-teal-900/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Archive className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                Download All 3 Documents Package (ZIP Archive)
+              </h4>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                Bundles all 3 print-ready PDFs and statutory compliance metadata into <span className="font-mono font-medium text-teal-700 dark:text-teal-300">CreatorEDF_All_Documents_{sanitizedInvoice}.zip</span>
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadZipBundle}
+            disabled={!isFormValid || Boolean(isExporting)}
+            className={`w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition shadow-sm shrink-0 ${
+              isFormValid && !isExporting
+                ? "bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white cursor-pointer shadow-teal-600/20"
+                : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
+            }`}
+          >
+            {isExporting === "zip" ? (
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            ) : (
+              <Archive className="w-4 h-4" />
+            )}
+            <span>{isExporting === "zip" ? "Compressing Archive..." : "Download All 3 PDFs (ZIP)"}</span>
+          </button>
         </div>
       </div>
 
